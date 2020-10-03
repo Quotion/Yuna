@@ -1,4 +1,3 @@
-import os
 from configparser import ConfigParser
 from datetime import datetime
 
@@ -38,8 +37,26 @@ class User(BaseModel):
 class UserGame(BaseModel):
     steamid = ForeignKeyField(User, column_name="steamid", on_delete="cascade", on_update="cascade", primary_key=True)
     name = CharField(max_length=256, null=False, default="invalid_name")
-    role = ForeignKeyField(User, column_name="role", on_delete="cascade", on_update="cascade")
+    rank = ForeignKeyField(User, column_name="role", on_delete="cascade", on_update="cascade")
 
     class Meta:
         db_table = "userGame"
         order_by = ("role",)
+
+
+class Role(BaseModel):
+    role_id = BigIntegerField(null=False, default=0)
+    name = CharField(max_length=32, null=False, default="invalid-role")
+
+    class Meta:
+        db_table = "role"
+        order_by = ("name", )
+
+
+class RoleAndUser(BaseModel):
+    discord_id = BigIntegerField(null=False, default=0)
+    role_id = BigIntegerField(null=False, default=0)
+
+    class Meta:
+        db_table = "discord_id"
+        order_by = ("roleanduser", )
