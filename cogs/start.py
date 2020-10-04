@@ -242,6 +242,38 @@ class Events(commands.Cog):
                                 f"\n[Аргумент]: {error.param}```"
             embed.set_footer(text=f"Дата вызова ошибки {now.strftime('%d.%m.%Y %H:%M')}")
             await ctx.send(embed=embed)
+            await ctx.send_help(ctx.command)
+        elif isinstance(error, commands.MissingPermissions):
+            embed = discord.Embed(colour=discord.Colour.light_gray())
+            embed.description = "```css\n[Доступ] к данной команде заблокирован." \
+                                f"\nРоль для получения [доступа]: {error.missing_perms[0]}```"
+            embed.set_footer(text=f"Дата вызова ошибки {now.strftime('%d.%m.%Y %H:%M')}")
+            await ctx.send(embed=embed)
+        elif isinstance(error, commands.TooManyArguments):
+            embed = discord.Embed(colour=discord.Colour.dark_gold())
+            embed.set_author(name="Слишком много [Аргументов] в данной команде.")
+            embed.description = f"{ctx.author.mention} вы ввели [аргументы], которые скорее всего не нужны здесь."
+            embed.set_footer(text=f"Дата вызова ошибки {now.strftime('%d.%m.%Y %H:%M')}")
+            await ctx.send(embed=embed)
+            await ctx.send_help(ctx.command)
+        elif isinstance(error, commands.TooManyArguments):
+            embed = discord.Embed(colour=discord.Colour.dark_gold())
+            embed.set_author(name="Слишком много [Аргументов] в данной команде.")
+            embed.description = f"{ctx.author.mention} вы ввели [аргументы], которые скорее всего не нужны здесь."
+            embed.set_footer(text=f"Дата вызова ошибки {now.strftime('%d.%m.%Y %H:%M')}")
+            await ctx.send(embed=embed)
+            await ctx.send_help(ctx.command)
+        elif isinstance(error, commands.CommandOnCooldown):
+            embed = discord.Embed(colour=discord.Colour.red())
+            embed.set_author(name="Пожалуйста, не спешите.")
+            if int(error.retry_after) == 1:
+                cooldown = "{}, ожидайте ещё {} секунду перед тем как повторить команду."
+            elif 2 <= int(error.retry_after) <= 4:
+                cooldown = "{}, ожидайте ещё {} секунды перед тем как повторить команду."
+            else:
+                cooldown = "{}, ожидайте ещё {} секунд перед тем как повторить команду."
+            embed.description = cooldown.format(ctx.author.mention, int(error.retry_after))
+            await ctx.send(embed=embed)
         else:
             embed = discord.Embed(colour=discord.Colour.light_gray())
             embed.description = "```css\nВызвана [ошибка], которую невозможно обработать." \

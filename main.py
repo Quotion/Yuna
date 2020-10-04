@@ -20,5 +20,6 @@ client = commands.Bot(command_prefix="-")
 
 client.add_cog(cogs.Events(client))
 client.add_cog(cogs.Orders(client))
+client.add_cog(cogs.Vote(client))
 
 client.run(config.get("DISCORD", "token"))
