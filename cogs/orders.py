@@ -21,7 +21,7 @@ class Orders(commands.Cog, name="Приказы рангового сервер�
         self.logger = logger
 
     def get_name_of_role(self, ctx) -> str:
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "chief_metro")))
+        role = ctx.guild.get_role(int(config.get("ROLES_ID", "superadmin")))
         if role in ctx.author.roles:
             return "Начальник Метрополитена"
 
@@ -37,11 +37,11 @@ class Orders(commands.Cog, name="Приказы рангового сервер�
         if role in ctx.author.roles:
             return "Начальник Службы Подвижного Состава"
 
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "senior_train_dispatcher")))
+        role = ctx.guild.get_role(int(config.get("ROLES_ID", "senior_dispatcher")))
         if role in ctx.author.roles:
             return "Старший Поездной Диспетчер"
 
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "senior_driver_instructor")))
+        role = ctx.guild.get_role(int(config.get("ROLES_ID", "senior_instructor")))
         if role in ctx.author.roles:
             return "Старший Машинист-инструктор"
 
@@ -49,7 +49,7 @@ class Orders(commands.Cog, name="Приказы рангового сервер�
         if role in ctx.author.roles:
             return "Ревизор"
 
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "driver_instructor")))
+        role = ctx.guild.get_role(int(config.get("ROLES_ID", "instructor")))
         if role in ctx.author.roles:
             return "Машинист-инструктор"
 
@@ -57,7 +57,7 @@ class Orders(commands.Cog, name="Приказы рангового сервер�
         if role in ctx.author.roles:
             return "Диспетчер"
 
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "acting_instructor")))
+        role = ctx.guild.get_role(int(config.get("ROLES_ID", "actinstructor")))
         if role in ctx.author.roles:
             return "И.О.Машинист-инструктор"
 
@@ -121,7 +121,6 @@ class Orders(commands.Cog, name="Приказы рангового сервер�
             await self.__delete_message(ctx, message)
         else:
             await self.__send_message(reaction, ctx, message, embed)
-
 
     @commands.command(name="приказ", help="<префикс>приказ <№ приказа> <приказ>")
     async def order(self, ctx, order_id, *, order: str):

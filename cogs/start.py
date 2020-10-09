@@ -25,8 +25,6 @@ class Events(commands.Cog):
             dbhandle.connect()
             if not dbhandle.table_exists("user"):
                 dbhandle.create_tables([User])
-            if not dbhandle.table_exists("usergame"):
-                dbhandle.create_tables([UserGame])
             if not dbhandle.table_exists("role"):
                 dbhandle.create_tables([Role])
             if not dbhandle.table_exists("roleanduser"):
@@ -60,7 +58,7 @@ class Events(commands.Cog):
                 .on_conflict_ignore() \
                 .execute()
 
-            role = discord.utils.get(member.guild.roles, name="Помощник машинста")
+            role = member.guild.get_role(config.get('ROLES_ID', 'user'))
             if not role:
                 raise commands.MissingRole("Помошник машиниста")
 
