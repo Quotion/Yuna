@@ -30,34 +30,38 @@ class BaseModel(Model):
 #         db_table = "userGame"
 #         order_by = ("role",)
 
+class Player(BaseModel):
+    SID = CharField(max_length=24, default='STEAM_0:0:0000000000')
+    group = TextField(null=False)
+    status = TextField(null=False)
+    nick = TextField(null=False)
+    synch = SmallIntegerField(null=False)
+    synchgroup = TextField(null=False)
+
+    class Meta:
+        db_table = "ma_players"
+        order_by = ("SID",)
+
+
+class Role(BaseModel):
+    role_id = BigIntegerField(null=False, default=0)
+    role_gmod = CharField(max_length=32, null=False, default="invalid-role")
+    name = CharField(max_length=64, null=False, default="invalid-role")
+
+    class Meta:
+        db_table = "role"
+        order_by = ("name",)
+
 
 class User(BaseModel):
     discord_id = BigIntegerField(null=False, primary_key=True)
-    name = CharField(max_length=32, null=False, default="invalid_name")
-    role = CharField(max_length=64, null=False, default="invalid_role")
+    mgil = BigIntegerField(null=False, default=0)
     gil = BigIntegerField(null=False, default=0)
     fortuna_wheel = BooleanField(default=True)
     created_at = DateTimeField(null=False, default=datetime.now())
-    steamid = CharField(max_length=32, null=True, default="STEAM_0:0:0000000000")
+    SID = CharField(max_length=24, default='STEAM_0:0:0000000000')
 
     class Meta:
         db_table = "user"
         order_by = ("created_at",)
 
-
-class Role(BaseModel):
-    role_id = BigIntegerField(null=False, default=0)
-    name = CharField(max_length=32, null=False, default="invalid-role")
-
-    class Meta:
-        db_table = "role"
-        order_by = ("name", )
-
-
-class RoleAndUser(BaseModel):
-    discord_id = BigIntegerField(null=False, default=0)
-    role_id = BigIntegerField(null=False, default=0)
-
-    class Meta:
-        db_table = "discord_id"
-        order_by = ("roleanduser", )

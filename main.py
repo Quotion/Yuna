@@ -13,7 +13,6 @@ config.read("config.ini", encoding="utf8")
 logging.basicConfig(format="%(levelname)s: %(funcName)s (%(lineno)d): %(name)s: %(message)s",
                     level=logging.INFO)
 log = logging.getLogger("main")
-log.setLevel(logging.INFO)
 
 
 client = commands.Bot(command_prefix="-")

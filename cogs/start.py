@@ -1,16 +1,15 @@
-import numpy
+import logging
 import os
+from datetime import timedelta, timezone
 
 import discord
-from datetime import timedelta, timezone
+import numpy
 from discord.ext import commands
-from models import *
-import logging
 
+from models import *
 
 config = ConfigParser()
 config.read("config.ini", encoding="utf8")
-
 
 log = logging.getLogger("main")
 
@@ -22,17 +21,15 @@ class Events(commands.Cog):
         self.check()
 
         try:
-            dbhandle.connect()
-            if not dbhandle.table_exists("user"):
-                dbhandle.create_tables([User])
+            dbhandle.connect(reuse_if_open=True)
             if not dbhandle.table_exists("role"):
                 dbhandle.create_tables([Role])
-            if not dbhandle.table_exists("roleanduser"):
-                dbhandle.create_tables([RoleAndUser])
+            if not dbhandle.table_exists("ma_players"):
+                dbhandle.create_tables([Player])
+            if not dbhandle.table_exists("user"):
+                dbhandle.create_tables([User])
         except Exception as error:
             log.error(error)
-        finally:
-            dbhandle.close()
 
     def user_bot(self, user_id):
         return self.client.user.id == user_id
@@ -45,16 +42,33 @@ class Events(commands.Cog):
     async def on_ready(self):
         log.info("Bot Yuna ready on 100%")
 
+        guild = self.client.get_guild(int(config.get("GUILD", "guild_id")))
+
+        try:
+            dbhandle.connect(reuse_if_open=True)
+
+            for key in config["ROLES_ID"]:
+                data = Role.select().where(Role.role_id == config['ROLES_ID'][key])
+                if data:
+                    continue
+                Role.insert(role_id=config['ROLES_ID'][key],
+                            role_gmod=key,
+                            name=guild.get_role(int(config['ROLES_ID'][key])).name) \
+                    .on_conflict_ignore() \
+                    .execute()
+        except Exception as error:
+            raise commands.CommandError(error)
+        finally:
+            dbhandle.close()
+
     @commands.Cog.listener()
     async def on_member_join(self, member):
         now = datetime.now(timezone(timedelta(hours=3)))
 
         try:
-            dbhandle.connect()
+            dbhandle.connect(reuse_if_open=True)
 
-            User.insert(discord_id=member.id,
-                        name=member.name,
-                        role=member.roles[0].id) \
+            User.insert(discord_id=member.id) \
                 .on_conflict_ignore() \
                 .execute()
 

@@ -5,6 +5,7 @@ import datetime
 import logging
 from discord.ext import commands
 from configparser import ConfigParser
+from models import Role, dbhandle
 
 config = ConfigParser()
 config.read("config.ini", encoding="utf8")
@@ -21,49 +22,16 @@ class Orders(commands.Cog, name="Приказы рангового сервер�
         self.logger = logger
 
     def get_name_of_role(self, ctx) -> str:
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "superadmin")))
-        if role in ctx.author.roles:
-            return "Начальник Метрополитена"
+        try:
+            dbhandle.connect(reuse_if_open=True)
+            role = Role.select().where(Role.role_id == ctx.author.top_role.id)[0]
+        except IndexError:
+            raise commands.CommandError("Профиль пользователя не был создан в БД")
+        except Exception as error:
+            raise commands.CommandError(error)
 
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "chief_motion")))
-        if role in ctx.author.roles:
-            return "Начальник Службы Движения"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "chief_safe")))
-        if role in ctx.author.roles:
-            return "Начальник Службы Безопасности Движения"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "chief_rolling_stock")))
-        if role in ctx.author.roles:
-            return "Начальник Службы Подвижного Состава"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "senior_dispatcher")))
-        if role in ctx.author.roles:
-            return "Старший Поездной Диспетчер"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "senior_instructor")))
-        if role in ctx.author.roles:
-            return "Старший Машинист-инструктор"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "inspector")))
-        if role in ctx.author.roles:
-            return "Ревизор"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "instructor")))
-        if role in ctx.author.roles:
-            return "Машинист-инструктор"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "dispatcher")))
-        if role in ctx.author.roles:
-            return "Диспетчер"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "actinstructor")))
-        if role in ctx.author.roles:
-            return "И.О.Машинист-инструктор"
-
-        role = ctx.guild.get_role(int(config.get("ROLES_ID", "dscp")))
-        if role in ctx.author.roles:
-            return "Дежурный Станционного Поста Централизации."
+        if role:
+            return role.name
 
     async def __delete_message(self, ctx, message):
         await ctx.message.delete()
@@ -184,7 +152,7 @@ class Orders(commands.Cog, name="Приказы рангового сервер�
 
         now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=3)))
 
-        chief = self.get_name_of_role(ctx.author.roles)
+        chief = self.get_name_of_role(ctx)
 
         if not chief:
             embed = discord.Embed(colour=discord.Colour.orange())
